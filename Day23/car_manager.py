@@ -29,4 +29,3 @@ class CarManager:
     
     def car_speedup(self):
         self.car_speed += MOVE_INCREMENT
-        
