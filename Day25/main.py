@@ -16,7 +16,7 @@ def main():
         
         if answer_state == "Exit":
             df.to_csv("study.csv")
-            break        
+            break
         
         user_select = df[df.state == answer_state]
                 
