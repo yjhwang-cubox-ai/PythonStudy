@@ -5,6 +5,21 @@ import random
 import pyperclip
 import json
 
+# ---------------------------- SEARCH PASSWORD ------------------------------- #
+def search():
+    try:
+        with open("data.json", "r", encoding="utf8") as file:
+            data = json.load(file)
+    except FileNotFoundError:
+        messagebox.showinfo(message="There are not password information!")
+    else:        
+        search_website = website_entry.get().upper()
+        if search_website in data:
+            search_password = data[search_website]['password']
+            search_email = data[search_website]['email']
+            messagebox.showinfo(message=f"{search_website}\nEmail: {search_email}\nPassword: {search_password}")
+        else:
+            messagebox.showinfo(message="There are not that site's password!")
 
 # ---------------------------- PASSWORD GENERATOR ------------------------------- #
 def generate_password():
@@ -27,7 +42,7 @@ def generate_password():
 
 # ---------------------------- SAVE PASSWORD ------------------------------- #
 def save_information():
-    website = website_entry.get()
+    website = website_entry.get().upper()
     email = email_entry.get()
     password = password_entry.get()
     new_data = {
@@ -43,15 +58,20 @@ def save_information():
         is_ok = messagebox.askokcancel(title=website, message=f"email: {email}\npassword: {password}\nIs OK?")
     
         if is_ok:
-            with open("data.json", "r", encoding="utf8") as file:
-                data = json.load(file)
-                data.update(new_data)
-            with open("data.json", "w", encoding="utf8") as file:
-                json.dump(data, file, indent=4)
-            print("saved!")
-    
-    website_entry.delete(0, tkinter.constants.END)
-    password_entry.delete(0, tkinter.constants.END)
+            try:
+                with open("data.json", "r", encoding="utf8") as file:
+                    data = json.load(file)                    
+            except FileNotFoundError:
+                with open("data.json", "w", encoding="utf8") as file:
+                    json.dump(new_data, file, indent=4)
+            else:
+                data.update(new_data)        
+                with open("data.json", "w", encoding="utf8") as file:
+                    json.dump(data, file, indent=4)
+                print("saved!")
+            finally:
+                website_entry.delete(0, tkinter.constants.END)
+                password_entry.delete(0, tkinter.constants.END)
     
 
 # ---------------------------- UI SETUP ------------------------------- #
@@ -75,14 +95,17 @@ label1.grid(column=0,row=2)
 label1 = tkinter.Label(text="Password:")
 label1.grid(column=0,row=3)
 
+search_button = tkinter.Button(text="Search", command=search, width=13)
+search_button.grid(column=2, row=1)
+
 gen_pw_button = tkinter.Button(text="Generate Password", command=generate_password)
 gen_pw_button.grid(column=2, row=3)
 
 add_button = tkinter.Button(text="Add", width=44, command=save_information)
 add_button.grid(column=1, row=4, columnspan=2)
 
-website_entry = tkinter.Entry(width= 44)
-website_entry.grid(column=1,row=1, columnspan=2)
+website_entry = tkinter.Entry(width= 28)
+website_entry.grid(column=1,row=1)
 website_entry.focus()
 email_entry = tkinter.Entry(width= 44)
 email_entry.grid(column=1,row=2, columnspan=2)
